@@ -45,7 +45,7 @@ int main() {
     long long result = pow(base,power);
     cout << "base: " << base << endl << "power: " << power << endl;
     cout << base <<"^" << power << "= " << result << endl; 
-    cout << "Sum of Digits: " <<sum(result); 
+    cout << "Sum of Digits: " <<sum(result) << endl; 
 
     return 0; 
 }
