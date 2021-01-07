@@ -1,46 +1,51 @@
 #include <iostream>
-#include <limits.h>
 #include <string>
 using namespace std; 
 
-//OTHER CHANGES: Make variable names more relevant : "result" and "sum" should be made into two words if possible
 
-long long pow(int base,int power){
+//unsigned long long to maximize size of output (more bytes to use)
+unsigned long long pow(int base,int power){
     long long totalResult = 1;
 
     for (int i = 0; i < power; i++){
         totalResult = totalResult * base;
     }
-    cout << base <<"^ " << power << "= " << totalResult << endl; 
     return totalResult;
 }
 
-void sum(long long result){
+int sum(long long result){
     string rString = to_string(result);
     int sum = 0;
+
+    //convert eachs character number into temporary integers, adds each of them together
     for (unsigned int i = 0; i < rString.size(); i++ ){
-        int curr = int(rString.at(i)) -48; // it felt awkward converting from long long to string and then turning a number character to an int... 
-        sum += curr;                       // let's see if it can be simplified
+        int curr = int(rString.at(i)) -48; // substract by 48 because ascii valus begin at 48: http://www.asciitable.com/
+        sum += curr;                       
     }
-    cout << "Sum of Digits: " << sum;
+    return sum;
 }
 
-int main() {    
-    int base = -1;  //FIX ME: Let's solve this problem using signed integers when I have more time [just to make things a bit more sophisticated]
-    int power = -1; // Get rid of while loop, try and catch if there are any errors, repeat prompt
+int main() { 
+    int base;
+    int power;
+    
+    //take user base and power user inputs, print them 
+    cout << "What is the base? (Must be a positive integer!) : ";       
+    cin >> base;
+    cout << "What is the power? (Positive integer!) : ";
+    cin >> power; cout << endl << "RESULTS: " << endl;
 
-
-    //ensure userInputs area positive integers
-    while (base < 0){
-        cout << "What is the base? (Must be a positive integer!) : ";       
-        cin >> base;
+    //Basic check: If Integer is negative, print guidance and restart the program
+    if( (power < 0) || (base < 0) ){
+        cout << "USER ERROR: MUST BE POSITIVE INT!" << endl << endl;
+        main();
     }
-
-    while (power < 0){
-        cout << "What is the power? (Must be a positive integer!) : ";       
-        cin >> power;
-    }
+    
+    //Compute base ^ power and find the sum of the result's digits
+    long long result = pow(base,power);
     cout << "base: " << base << endl << "power: " << power << endl;
-    sum(pow(base, power));   //FIX ME: Code runs fine, but let's improve readability by separating sum() and pow()
+    cout << base <<"^" << power << "= " << result << endl; 
+    cout << "Sum of Digits: " <<sum(result); 
+
     return 0; 
 }

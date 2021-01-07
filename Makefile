@@ -1,7 +1,7 @@
 all:
-	g++ -Wall product-digit-sum.cpp -o dow
+	g++ -Wall product-digit-sum.cpp -o sum
 
 run:
-	./dow
+	./sum
 
 try: all run
