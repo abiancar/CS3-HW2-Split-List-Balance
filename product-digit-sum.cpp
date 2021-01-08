@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <cassert>
 using namespace std; 
 
 
@@ -13,22 +15,54 @@ unsigned long long pow(int base,int power){
     return totalResult;
 }
 
-int sum(long long result){
-    string rString = to_string(result);
+int sum_vector(vector<int> result){
     int sum = 0;
+    
 
-    //convert eachs character number into temporary integers, adds each of them together
-    for (unsigned int i = 0; i < rString.size(); i++ ){
-        int curr = int(rString.at(i)) -48; // substract by 48 because ascii valus begin at 48: http://www.asciitable.com/
-        sum += curr;                       
+    for (size_t i = 0; i < result.size() ; i++){
+    cout << result.at(i);
+    sum+= result.at(i) ;
     }
+    cout << endl << sum;
     return sum;
+}
+
+vector<int> vectorize_digits(unsigned long long n){
+    unsigned long long originalNum = n; // copy of num
+    int numDigits = 0;
+    while (n > 0){
+        n = n / 10;
+        numDigits++;
+    }
+
+    vector<int> numList(numDigits);    
+
+    for(int i = numList.size()-1; i >= 0; i--){
+        numList.at(i) = originalNum % 10;
+        originalNum = originalNum / 10;
+    }
+
+    for (size_t i = 0; i < numList.size() ; i++){
+    cout << numList.at(i);
+    }
+    return numList;
+}
+
+int test(){
+    return 0;
 }
 
 int main() { 
     int base;
     int power;
     
+
+    //QUICK TEST: VECTORIZE_DIGITS()
+    long long n = 101164684648;
+    sum_vector(vectorize_digits(n));
+
+
+
     //take user base and power user inputs, print them 
     cout << "What is the base? (Must be a positive integer!) : ";       
     cin >> base;
@@ -38,14 +72,14 @@ int main() {
     //Basic check: If Integer is negative, print guidance and restart the program
     if( (power < 0) || (base < 0) ){
         cout << "USER ERROR: MUST BE POSITIVE INT!" << endl << endl;
-        main();
+        main();  //FIX ME: BAD PRACTICE TO RECURSIVELY CALL MAIN(), look at professor's feedback
     }
     
     //Compute base ^ power and find the sum of the result's digits
     long long result = pow(base,power);
     cout << "base: " << base << endl << "power: " << power << endl;
     cout << base <<"^" << power << "= " << result << endl; 
-    cout << "Sum of Digits: " <<sum(result) << endl; 
+   // cout << "Sum of Digits: " <<sum_vector(result) << endl; 
 
     return 0; 
 }
