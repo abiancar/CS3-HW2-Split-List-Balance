@@ -17,13 +17,10 @@ unsigned long long pow(int base,int power){
 
 int sum_vector(vector<int> result){
     int sum = 0;
-    
 
     for (size_t i = 0; i < result.size() ; i++){
-    cout << result.at(i);
     sum+= result.at(i) ;
     }
-    cout << endl << sum;
     return sum;
 }
 
@@ -41,27 +38,45 @@ vector<int> vectorize_digits(unsigned long long n){
         numList.at(i) = originalNum % 10;
         originalNum = originalNum / 10;
     }
-
-    for (size_t i = 0; i < numList.size() ; i++){
-    cout << numList.at(i);
-    }
     return numList;
+}
+
+
+string vector_to_string(vector<int> numList){
+    string numString ("[");
+    for (size_t i = 0; i < numList.size();i++){
+        numString += to_string(numList.at(i)); //ascii 48 is where numbers begin
+        if(i != numList.size()-1){numString += ',';}
+    }
+    numString += "]";
+    return numString;
 }
 
 int test(){
     return 0;
 }
 
+
+
+
+
+
+
+
+
+
+
 int main() { 
-    int base;
-    int power;
-    
 
     //QUICK TEST: VECTORIZE_DIGITS()
-    long long n = 101164684648;
-    sum_vector(vectorize_digits(n));
+    long long n = 1234567;
+    vector<int> list = {1,2,3,4,5,6,7};
+    cout << sum_vector (list);
+    cout << sum_vector(vectorize_digits(n)) << endl;
+    cout << vector_to_string(vectorize_digits(n)) << endl;
 
-
+    int base;
+    int power;
 
     //take user base and power user inputs, print them 
     cout << "What is the base? (Must be a positive integer!) : ";       
@@ -82,4 +97,11 @@ int main() {
    // cout << "Sum of Digits: " <<sum_vector(result) << endl; 
 
     return 0; 
+
+
+
+
+
+
+
 }
