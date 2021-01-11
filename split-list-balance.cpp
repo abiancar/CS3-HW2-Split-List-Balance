@@ -61,9 +61,23 @@ int findMax(vector<int> vector){
     return max;
 }
 
-//algorithm
+/* 
+
+GENERAL ALGORITHM:
+0) At each given level, create a variable that stores the min max
+1) Assume function (at base level) returns the minimum maximum given a vector
+2) Split given string into two valid sublists
+3) The left most substring will be called with m = 1
+4) The right substring will be called with m-1 as a parameter
+5) Store the results of each, compare them
+6) Find the maximum at each given split
+7) If it is the smallest maximum, update the min max to this value
+8) At the end of this split, return min maximum
+
+*/
+
 int split_vec(vector<int> vec, int m){
-    int maxMin = INT_MAX; // used to see if maximum at every split is smaller than curr maxima
+    int maxMin = INT_MAX; // used to store the smallest maximum
     int size = vec.size();
     
     // if the size is greater than m, or if m is 0, there is a user error
@@ -72,30 +86,26 @@ int split_vec(vector<int> vec, int m){
         exit(1);
     }
     
-    //if m is equal to the size, and the size is greater than 1
-    // we have a list like this: {1,2,3} m = 3.
-    // split into sublists for printing purposes, find max and return max
+    // if we have a list like this: {1,2,3} m = 3.
+    // find and return maximum
     if(m == size && size > 1){
         return findMax(vec);
     }
     
     // if we are left with a list like: {1,2,3,4} with m =1
-    // this is as small as a sublist can get, add all digits and return sum
+    // this is as small we can split a given list, add all digits and return sum
     else if (m == 1){
         return sum_vector(vec);
     }
 
-    // m is greater than 2, we need to recursively call split_vector()
-    // test all different ways m = 1 can be called using the first number of the vector
-    // during each test, the rest of the list is considered substring 2
-    // compare substring 1 and 2 to find maximum, add maximum to maxima for later use
-
+    // if m >= 2, we need to use recurive calls to find the minMax
     else{
-        for (size_t i = 0; i < vec.size()-m+1; i++){   // iterates till size -m + 1, stopping to avoid creating an impossible sublist with m = 1 during each iteration
+        for (size_t i = 0; i < vec.size()-m+1; i++){  // iterates till size -m + 1 to avoid creating an impossible split
             unsigned j = i + 1;
             vector<int> subList1;
             vector<int> subList2;
 
+            //creates two sublists given the current split
             for(size_t k = 0; k < j; k++){
                 subList1.push_back(vec.at(k));
             }
@@ -103,9 +113,13 @@ int split_vec(vector<int> vec, int m){
                 subList2.push_back(vec.at(k));
             }
 
+            // leftmost sublist is created as single value vector, with m =1
+            // rightmost sublist contains remainder of original vector
             int result1 = split_vec(subList1,1);
             int result2 = split_vec(subList2,m-1);
-        
+
+            //every time a vector is called, find the maximum between the left and right
+            //vector at the given split
             int curr_max; 
             if (result1 > result2){
                 curr_max = result1;   
@@ -113,32 +127,40 @@ int split_vec(vector<int> vec, int m){
             else{            
                 curr_max = result2;
             }
+            // if the maximum at this split is smaller than maxMin, update maxMin to this value
             if(curr_max < maxMin){
                 maxMin = curr_max;
             }
         }
+        // at this point we have tested all maxima in the given split
+        // return the smallest for output or further recursive calls
         return maxMin;
     }
-    return 0;
+    return 2;
 }
 
 
 int main(){
+    
+    //test: m = vector size 4
     int m = 3;     
     vector<int> vec = {1, 4, 4};
     cout << "INPUT: " << vector_to_string(vec) << "  m: " << m << endl;
     cout << "ans: " << split_vec(vec, m) << endl << endl;    
     
+    //test: m = 2 with non consecutive numbers, answer should be 18
     m = 2;
     vec = {7,2,5,10,8};
     cout << "INPUT: " << vector_to_string(vec) << "  m: " << m << endl;
     cout << "ans: " << split_vec(vec, m) << endl << endl;
 
+    //test: m = 2 with consecutive numbers, answer should be 11
     m = 2;
     vec = {2,3,4,5,6};
     cout << "INPUT: " << vector_to_string(vec) << "  m: " << m << endl;
     cout << "ans: " << split_vec(vec, m) << endl << endl;    
     
+    //test: m = 4 with moderately sized list, answer should be 7
     m = 4;
     vec = {7,6,2,5,3,4};
     cout << "INPUT: " << vector_to_string(vec) << "  m: " << m << endl;
