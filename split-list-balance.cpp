@@ -1,12 +1,10 @@
 #include <iostream>
+#include <climits>
 #include <vector>
 using namespace std;
 
 
-vector<int> maxima;
-bool firstTime = true;
-
-// adds digits in vector
+//adds all values in an integer vector, returns sum
 int sum_vector(vector<int> result){
     int sum = 0;
 
@@ -16,17 +14,23 @@ int sum_vector(vector<int> result){
     return sum;
 }
 
-//turns number into vector
+//takes number values and converts it to int vector
 vector<int> vectorize_digits(unsigned long long n){
-    unsigned long long originalNum = n; // copy of num
+    unsigned long long originalNum = n; // copy of n, so that the original number can be preserved
     int numDigits = 0;
-    while (n > 0){
+    
+    //hard coded for n==0, without this if statement, while loop never breaks
+    if(n == 0){
+        return {0};
+    }
+    //counts number of digits in n
+    while (n == 0){
         n = n / 10;
         numDigits++;
     }
+    vector<int> numList(numDigits);// creates list of size of the number of digits    
 
-    vector<int> numList(numDigits);    
-
+    // fill list with appropriate values from right to left
     for(int i = numList.size()-1; i >= 0; i--){
         numList.at(i) = originalNum % 10;
         originalNum = originalNum / 10;
@@ -34,11 +38,11 @@ vector<int> vectorize_digits(unsigned long long n){
     return numList;
 }
 
-//converts vector into string
+// used for debugging, not called in main()
 string vector_to_string(vector<int> numList){
     string numString ("[");
     for (size_t i = 0; i < numList.size();i++){
-        numString += to_string(numList.at(i)); //ascii 48 is where numbers begin
+        numString += to_string(numList.at(i)); 
         if(i != numList.size()-1){numString += ',';}
     }
     numString += "]";
@@ -57,25 +61,11 @@ int findMax(vector<int> vector){
     return max;
 }
 
-//finds min number of a vector
-int findMin(vector<int> vector){
-    int min = vector.at(0);
-    for (size_t  i = 0; i < vector.size(); i++){
-        int curr = vector.at(i);
-        if(curr < min){
-            min = curr;
-        }
-    }
-    return min;
-}
-
-string getMax(){
-    return vector_to_string(maxima);
-}
-
 //algorithm
 int split_vec(vector<int> vec, int m){
+    int maxMin = INT_MAX; // used to see if maximum at every split is smaller than curr maxima
     int size = vec.size();
+    
     // if the size is greater than m, or if m is 0, there is a user error
     if(m == 0 || m > size){
         cout << endl<< "ERROR: CANNOT SPLIT WITH GIVEN M AND VECTOR" << endl;
@@ -86,58 +76,22 @@ int split_vec(vector<int> vec, int m){
     // we have a list like this: {1,2,3} m = 3.
     // split into sublists for printing purposes, find max and return max
     if(m == size && size > 1){
-        int max = 0;
-        for (int i = 0; i < size; i++){
-            vector<int> subVector;
-            subVector.push_back(vec.at(i));
-            cout << vector_to_string(subVector);
-            if (vec.at(i) > max){
-                max = vec.at(i);
-            }
-        }
-        return max;
+        return findMax(vec);
     }
     
     // if we are left with a list like: {1,2,3,4} with m =1
     // this is as small as a sublist can get, add all digits and return sum
     else if (m == 1){
-        cout << vector_to_string(vec);
         return sum_vector(vec);
     }
-    
-    //if m ==2, we have a list like: {1,2,3,4}
-     
-    else if (m == 2){
-        for (size_t i = 0; i < vec.size()-1; i++){
-            
-            unsigned j = i + 1;
-            vector<int> subList1;
-            vector<int> subList2;
 
-            //creates two subLists based on the current intervals i and j
-            for(size_t k = 0; k < j; k++){
-                subList1.push_back(vec.at(k));
-            }
-            for(size_t k = j; k < vec.size(); k++){
-                subList2.push_back(vec.at(k));
-            }
-
-            //stores results of splits
-            int result1 = split_vec(subList1,1);
-            int result2 = split_vec(subList2,1);
-
-            if (result1 > result2){
-                maxima.push_back(result1);
-            }else{
-                maxima.push_back(result2);
-            }
-            cout << endl;
-        }
-    }
+    // m is greater than 2, we need to recursively call split_vector()
+    // test all different ways m = 1 can be called using the first number of the vector
+    // during each test, the rest of the list is considered substring 2
+    // compare substring 1 and 2 to find maximum, add maximum to maxima for later use
 
     else{
-        for (size_t i = 0; i < vec.size()-m+1; i++){
-            
+        for (size_t i = 0; i < vec.size()-m+1; i++){   // iterates till size -m + 1, stopping to avoid creating an impossible sublist with m = 1 during each iteration
             unsigned j = i + 1;
             vector<int> subList1;
             vector<int> subList2;
@@ -148,43 +102,46 @@ int split_vec(vector<int> vec, int m){
             for(size_t k = j; k < vec.size(); k++){
                 subList2.push_back(vec.at(k));
             }
-
-            cout << vector_to_string(subList1) << " ";
-            cout << vector_to_string(subList2) << endl;
 
             int result1 = split_vec(subList1,1);
             int result2 = split_vec(subList2,m-1);
-            
-
+        
+            int curr_max; 
             if (result1 > result2){
-                maxima.push_back(result1);
-                cout << "maximum is: " << result1 << endl;
-            }else{
-                maxima.push_back(result2);
-                cout << "maximum is: " << result2 << endl;
+                curr_max = result1;   
             }
-
+            else{            
+                curr_max = result2;
+            }
+            if(curr_max < maxMin){
+                maxMin = curr_max;
+            }
         }
+        return maxMin;
     }
-
-    int min = maxima.at(0);
-    for(size_t i = 0; i < maxima.size(); i++){
-        int curr = maxima.at(i);
-        if (curr < min){
-            min = curr;
-        }
-    }
-    cout << endl << endl << "MAX MINIMUM: " << findMin(maxima) << endl;     
-    cout << getMax(); 
     return 0;
 }
 
 
 int main(){
+    int m = 3;     
+    vector<int> vec = {1, 4, 4};
+    cout << "INPUT: " << vector_to_string(vec) << "  m: " << m << endl;
+    cout << "ans: " << split_vec(vec, m) << endl << endl;    
+    
+    m = 2;
+    vec = {7,2,5,10,8};
+    cout << "INPUT: " << vector_to_string(vec) << "  m: " << m << endl;
+    cout << "ans: " << split_vec(vec, m) << endl << endl;
 
-    int m = 3;
-    vector<int> vec = {1,2,3,4,5,6};
-    cout << endl << "ORIGINAL VECTOR: " << vector_to_string(vec) << endl;
-    cout << endl << split_vec(vec, m) << endl;    
+    m = 2;
+    vec = {2,3,4,5,6};
+    cout << "INPUT: " << vector_to_string(vec) << "  m: " << m << endl;
+    cout << "ans: " << split_vec(vec, m) << endl << endl;    
+    
+    m = 4;
+    vec = {7,6,2,5,3,4};
+    cout << "INPUT: " << vector_to_string(vec) << "  m: " << m << endl;
+    cout << "ans: " << split_vec(vec, m) << endl << endl;
     return 0;
 }
